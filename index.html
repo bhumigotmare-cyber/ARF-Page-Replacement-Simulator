@@ -1,0 +1,437 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARF | Page Replacement Simulator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">A</div>
+            <div>
+                <h2>ARF Simulator</h2>
+                <span>Operating Systems</span>
+            </div>
+        </div>
+
+        <p class="menu-label">MAIN MENU</p>
+
+        <a class="nav active" href="#dashboard">▦ Dashboard</a>
+        <a class="nav" href="#simulator">▤ Simulation</a>
+        <a class="nav" href="#comparison">◫ Comparison</a>
+        <a class="nav" href="#performanceGraph">▥ Performance Graph</a>
+        <a class="nav" href="#arfExplanation">ⓘ ARF Explanation</a>
+
+        <div class="sidebar-bottom">
+            <div class="status-dot"></div>
+            <span>System Ready</span>
+        </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main" id="dashboard">
+
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">OPERATING SYSTEMS / PROJECT</p>
+                <h1>Page Replacement Simulator</h1>
+                <p class="subtitle">
+                    Understand and compare memory management algorithms.
+                </p>
+            </div>
+
+            <div class="profile">ARF</div>
+        </header>
+
+        <!-- STATISTICS -->
+        <section class="stats">
+
+            <div class="stat-card">
+                <span>Total Pages</span>
+                <h2 id="totalPages">0</h2>
+                <small>Reference string length</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Page Hits</span>
+                <h2 id="pageHits">0</h2>
+                <small>Pages found in memory</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Page Faults</span>
+                <h2 id="pageFaults">0</h2>
+                <small>Pages loaded into memory</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Hit Ratio</span>
+                <h2 id="hitRatio">0%</h2>
+                <small>Memory performance</small>
+            </div>
+
+        </section>
+
+        <!-- PROJECT SUMMARY -->
+        <section class="panel" id="projectSummary">
+
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">PROJECT OVERVIEW</p>
+                    <h2>Project Summary</h2>
+                </div>
+
+                <span class="tag">LIVE SUMMARY</span>
+            </div>
+
+            <div class="summary-content">
+
+                <div class="summary-highlight">
+                    <span>Best Performing Algorithm</span>
+                    <h2 id="bestAlgorithm">Not calculated yet</h2>
+                    <small id="bestFaults">
+                        Run Compare All Algorithms to see the result.
+                    </small>
+                </div>
+
+                <div class="summary-explanation">
+                    <h3>Performance Analysis</h3>
+                    <p id="summaryExplanation">
+                        The simulator compares ARF, FIFO, LRU and LFU
+                        using the same page reference string and number
+                        of memory frames.
+                    </p>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- SIMULATION SETTINGS -->
+        <section class="panel" id="simulator">
+
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">CONFIGURATION</p>
+                    <h2>Simulation Settings</h2>
+                </div>
+
+                <span class="tag">LIVE SIMULATOR</span>
+            </div>
+
+            <label for="pages">Page Reference String</label>
+
+            <input
+                id="pages"
+                type="text"
+                value="1, 2, 3, 1, 4, 5, 2, 1, 2, 3, 4, 5"
+                placeholder="Example: 1, 2, 3, 4, 1"
+            >
+
+            <div class="settings-row">
+
+                <div>
+                    <label for="frames">Number of Memory Frames</label>
+
+                    <input
+                        id="frames"
+                        type="number"
+                        min="1"
+                        max="20"
+                        value="3"
+                    >
+                </div>
+
+                <div>
+                    <label for="algorithm">Select Algorithm</label>
+
+                    <select id="algorithm">
+                        <option value="ARF">ARF - Adaptive Replacement</option>
+                        <option value="FIFO">FIFO</option>
+                        <option value="LRU">LRU</option>
+                        <option value="LFU">LFU</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="button-group">
+
+                <button id="runBtn" onclick="runSimulation()">
+                    ▶ Run Simulation
+                </button>
+
+                <button id="compareBtn" onclick="compareAlgorithms()">
+                    Compare All Algorithms
+                </button>
+
+                <button id="resetBtn" onclick="resetSimulation()">
+                    ↻ Reset Simulation
+                </button>
+
+                <button id="downloadBtn" onclick="downloadReport()">
+                    ↓ Download PDF Report
+                </button>
+
+            </div>
+
+            <p id="message" class="message"></p>
+
+        </section>
+
+        <!-- MEMORY VISUALIZATION -->
+        <section class="panel">
+
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">MEMORY VISUALIZATION</p>
+                    <h2>Memory Frame Status</h2>
+                </div>
+
+                <span class="tag">FRAME VIEW</span>
+            </div>
+
+            <div id="memoryFrames" class="memory-frames">
+                <p class="empty">
+                    Run a simulation to view memory frames.
+                </p>
+            </div>
+
+            <div class="legend">
+                <span><i class="hit-dot"></i> Page Hit</span>
+                <span><i class="fault-dot"></i> Page Fault</span>
+            </div>
+
+        </section>
+
+        <!-- COMPARISON RESULTS -->
+        <section class="panel" id="comparison">
+
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">PERFORMANCE</p>
+                    <h2>Simulation Results</h2>
+                </div>
+            </div>
+
+            <div id="results" class="results">
+                <p class="empty">
+                    Your simulation results will appear here.
+                </p>
+            </div>
+
+        </section>
+
+        <!-- PERFORMANCE GRAPH -->
+        <section class="panel" id="performanceGraph">
+
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">VISUAL ANALYSIS</p>
+                    <h2>Algorithm Performance Graph</h2>
+                </div>
+
+                <span class="tag">PAGE FAULT ANALYSIS</span>
+            </div>
+
+            <p class="graph-description">
+                Compare the total page faults generated by each algorithm.
+                Lower page faults indicate fewer memory replacements.
+            </p>
+
+            <div id="performanceChart" class="performance-chart">
+
+                <p class="empty">
+                    Run Compare All Algorithms to generate the performance graph.
+                </p>
+
+            </div>
+
+        </section>
+
+        <!-- ARF ALGORITHM EXPLANATION -->
+        <section class="panel" id="arfExplanation">
+
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">UNDERSTANDING THE ALGORITHM</p>
+                    <h2>How ARF Works</h2>
+                </div>
+
+                <span class="tag">ALGORITHM GUIDE</span>
+            </div>
+
+            <p class="graph-description">
+                Adaptive Replacement Frequency (ARF) is the educational
+                page replacement approach implemented in this project.
+                It considers both how frequently a page is used and how
+                recently it was accessed.
+            </p>
+
+            <div class="summary-content">
+
+                <div class="summary-highlight">
+                    <span>ARF Concept</span>
+                    <h2>Frequency + Recency</h2>
+                    <small>
+                        It considers page usage frequency along with page age.
+                    </small>
+                </div>
+
+                <div class="summary-explanation">
+                    <h3>How does it work?</h3>
+                    <p>
+                        1. The simulator checks whether the requested page
+                        is already present in memory.
+                    </p>
+                    <p>
+                        2. If present, it records a page hit and updates
+                        the page usage information.
+                    </p>
+                    <p>
+                        3. If absent, it records a page fault and loads
+                        the requested page into memory.
+                    </p>
+                    <p>
+                        4. If memory is full, the ARF heuristic considers
+                        frequency and age to select a page for replacement.
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- ARF REPLACEMENT FACTORS -->
+            <h3 class="arf-subheading">ARF Replacement Factors</h3>
+
+            <div class="stats">
+
+                <div class="stat-card">
+                    <span>Frequency</span>
+                    <h2>Usage Count</h2>
+                    <small>How many times a page has been accessed.</small>
+                </div>
+
+                <div class="stat-card">
+                    <span>Age</span>
+                    <h2>Time Factor</h2>
+                    <small>How long ago a page was last accessed.</small>
+                </div>
+
+            </div>
+
+            <!-- INTERACTIVE ARF CALCULATOR -->
+            <div class="arf-calculator">
+
+                <h3 class="arf-subheading">Try ARF Score Calculation</h3>
+
+                <p class="graph-description">
+                    Enter the frequency and age of each page.
+                    The page with the lowest ARF score is selected
+                    for replacement.
+                </p>
+
+                <div class="results">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Page</th>
+                                <th>Frequency</th>
+                                <th>Age</th>
+                                <th>ARF Score</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <input type="number" id="arfPage1" value="1" min="0">
+                                </td>
+                                <td>
+                                    <input type="number" id="arfFreq1" value="3" min="1">
+                                </td>
+                                <td>
+                                    <input type="number" id="arfAge1" value="2" min="0">
+                                </td>
+                                <td id="arfScore1">Not calculated</td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <input type="number" id="arfPage2" value="2" min="0">
+                                </td>
+                                <td>
+                                    <input type="number" id="arfFreq2" value="2" min="1">
+                                </td>
+                                <td>
+                                    <input type="number" id="arfAge2" value="4" min="0">
+                                </td>
+                                <td id="arfScore2">Not calculated</td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <input type="number" id="arfPage3" value="3" min="0">
+                                </td>
+                                <td>
+                                    <input type="number" id="arfFreq3" value="1" min="1">
+                                </td>
+                                <td>
+                                    <input type="number" id="arfAge3" value="5" min="0">
+                                </td>
+                                <td id="arfScore3">Not calculated</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" onclick="calculateARF()">
+                        Calculate ARF Scores
+                    </button>
+
+                    <button type="button" onclick="clearARFCalculator()">
+                        ↻ Clear Calculator
+                    </button>
+                </div>
+
+                <div id="arfCalculatorResult" class="summary-explanation arf-note">
+                    Enter the values and calculate to see which page is selected.
+                </div>
+
+            </div>
+
+            <!-- IMPORTANT NOTE -->
+            <div class="summary-explanation arf-note">
+                <h3>Important Note</h3>
+                <p>
+                    In this project, ARF uses an educational heuristic
+                    based on frequency divided by age plus one.
+                    It is a project-specific approach and not a standard
+                    operating system page replacement algorithm.
+                </p>
+            </div>
+
+        </section>
+
+        <footer>
+            Adaptive Page Replacement Simulator · OS Mini Project
+        </footer>
+
+    </main>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>

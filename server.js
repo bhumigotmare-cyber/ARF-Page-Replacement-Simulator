@@ -9,11 +9,9 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// Run the selected page replacement algorithm
 app.post("/run", (req, res) => {
     const { algorithm, pages, frames } = req.body;
 
-    // Validate input
     if (
         !Array.isArray(pages) ||
         !Number.isInteger(frames) ||
@@ -27,28 +25,19 @@ app.post("/run", (req, res) => {
         !["FIFO", "LRU", "LFU", "ARF"].includes(algorithm)
     ) {
         return res.status(400).json({
-            error: "Invalid input. Check your page reference string, frame count, and algorithm."
+            error: "Invalid input"
         });
     }
 
-    // Select the correct executable for Windows or Linux
-    const executable = process.platform === "win32"
-        ? "arf.exe"
-        : "arf";
+    const executable =
+        process.platform === "win32" ? "arf.exe" : "arf";
 
     const executablePath = path.join(__dirname, executable);
 
-    // Execute the C program
     execFile(
         executablePath,
-        [
-            algorithm,
-            pages.join(","),
-            String(frames)
-        ],
-        {
-            timeout: 5000
-        },
+        [algorithm, pages.join(","), String(frames)],
+        { timeout: 5000 },
         (error, stdout, stderr) => {
             if (error) {
                 console.error("Execution error:", error);
@@ -61,16 +50,15 @@ app.post("/run", (req, res) => {
                 const result = JSON.parse(stdout);
                 return res.json(result);
             } catch (parseError) {
-                console.error("Output parsing error:", parseError);
+                console.error("Parsing error:", parseError);
                 return res.status(500).json({
-                    error: "The C program returned invalid output."
+                    error: "Invalid program output"
                 });
             }
         }
     );
 });
 
-// Start the server
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`ARF Simulator running on port ${PORT}`);
 });
